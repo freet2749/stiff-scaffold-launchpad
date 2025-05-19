@@ -5,8 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ScaffoldOptions, generateScaffoldCommand } from "@/lib/generateScaffold";
+import { 
+  ScaffoldOptions, 
+  generateScaffoldCommand 
+} from "@/lib/generateScaffold";
 import { toast } from "@/components/ui/use-toast";
+import { SqlUploadSection } from "./SqlUploadSection";
+import { enhanceScaffoldOptions } from "@/lib/sqlParser";
 
 export function ScaffoldForm() {
   const [projectName, setProjectName] = useState("");
@@ -14,6 +19,7 @@ export function ScaffoldForm() {
   const [usesDatabase, setUsesDatabase] = useState(false);
   const [features, setFeatures] = useState<string[]>([]);
   const [generatedCommand, setGeneratedCommand] = useState("");
+  const [dbStructure, setDbStructure] = useState<any>(null);
 
   const availableFeatures = [
     { id: "auth", label: "Authentication" },
@@ -30,6 +36,14 @@ export function ScaffoldForm() {
     );
   };
 
+  const handleSqlParsed = (parsedStructure: any) => {
+    setDbStructure(parsedStructure);
+    // If database wasn't already enabled, turn it on since we have a SQL file
+    if (!usesDatabase) {
+      setUsesDatabase(true);
+    }
+  };
+
   const handleGenerate = () => {
     if (!projectName) {
       toast({
@@ -40,12 +54,17 @@ export function ScaffoldForm() {
       return;
     }
 
-    const options: ScaffoldOptions = {
+    let options: ScaffoldOptions = {
       projectName,
       description,
       usesDatabase,
       features,
     };
+
+    // Enhance options with database structure if available
+    if (dbStructure && usesDatabase) {
+      options = enhanceScaffoldOptions(options, dbStructure);
+    }
 
     const command = generateScaffoldCommand(options);
     setGeneratedCommand(command);
@@ -92,6 +111,10 @@ export function ScaffoldForm() {
           className="min-h-[100px]"
         />
       </div>
+
+      {usesDatabase && (
+        <SqlUploadSection onSqlParsed={handleSqlParsed} />
+      )}
 
       <div className="space-y-2">
         <Label>Features</Label>
