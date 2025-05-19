@@ -1,5 +1,6 @@
 
 import { Logo } from "./Logo";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,7 +20,7 @@ export function Footer() {
             <div>
               <h4 className="font-medium mb-2">Resources</h4>
               <ul className="text-sm space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Documentation</a></li>
+                <li><Link to="/docs" className="text-muted-foreground hover:text-foreground">Documentation</Link></li>
                 <li><a href="#" className="text-muted-foreground hover:text-foreground">Templates</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-foreground">Examples</a></li>
               </ul>
@@ -28,7 +29,7 @@ export function Footer() {
             <div>
               <h4 className="font-medium mb-2">Community</h4>
               <ul className="text-sm space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">GitHub</a></li>
+                <li><a href="https://github.com/stifftools" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">GitHub</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-foreground">Discord</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-foreground">Twitter</a></li>
               </ul>
