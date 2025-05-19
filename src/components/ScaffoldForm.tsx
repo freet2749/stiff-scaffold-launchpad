@@ -9,7 +9,7 @@ import {
   ScaffoldOptions, 
   generateScaffoldCommand 
 } from "@/lib/generateScaffold";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/sonner";
 import { SqlUploadSection } from "./SqlUploadSection";
 import { enhanceScaffoldOptions } from "@/lib/sqlParser";
 
@@ -46,10 +46,8 @@ export function ScaffoldForm() {
 
   const handleGenerate = () => {
     if (!projectName) {
-      toast({
-        title: "Project name required",
-        description: "Please enter a project name to generate a scaffold command",
-        variant: "destructive",
+      toast.error("Project name required", {
+        description: "Please enter a project name to generate a scaffold command"
       });
       return;
     }
@@ -68,13 +66,16 @@ export function ScaffoldForm() {
 
     const command = generateScaffoldCommand(options);
     setGeneratedCommand(command);
+    
+    toast.success("Command generated", {
+      description: "Your project scaffold command is ready"
+    });
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedCommand);
-    toast({
-      title: "Copied to clipboard!",
-      description: "The scaffold command is now in your clipboard.",
+    toast.success("Copied to clipboard!", {
+      description: "The scaffold command is now in your clipboard."
     });
   };
 
@@ -149,9 +150,14 @@ export function ScaffoldForm() {
               {generatedCommand}
             </code>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Run this command in your terminal to scaffold your MVC project.
+          <p className="text-sm text-muted-foreground mt-2">
+            Run this command in your terminal to scaffold your Next.js project with your selected options.
           </p>
+          <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-800 p-3 rounded-md mt-4">
+            <p className="text-sm text-amber-800 dark:text-amber-300">
+              This command uses <code>create-next-app</code>, which is the official scaffolding tool for Next.js projects.
+            </p>
+          </div>
         </div>
       )}
     </div>

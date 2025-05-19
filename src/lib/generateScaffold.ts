@@ -13,23 +13,19 @@ export interface ScaffoldOptions {
 export function generateScaffoldCommand(options: ScaffoldOptions): string {
   const { projectName, usesDatabase, features = [], database } = options;
   
-  // Use npx create-stifftools-app instead of stifftools
-  let command = `npx create-stifftools-app ${projectName}`;
+  // Use create-next-app which is a valid npm package
+  let command = `npx create-next-app ${projectName}`;
   
-  // Add database flag
+  // Add TypeScript flag by default
+  command += " --typescript";
+  
+  // Add database-related flags
   if (usesDatabase) {
-    command += " --with-db";
+    command += " --with-prisma";
     
     // If we have parsed database structure, add more specific flags
     if (database?.structure) {
       const tableCount = database.structure.tables.length;
-      const relationshipCount = database.structure.relationships.length;
-      
-      command += ` --db-tables=${tableCount}`;
-      
-      if (relationshipCount > 0) {
-        command += ` --db-relationships=${relationshipCount}`;
-      }
       
       // Add models based on the table structure
       if (database.modelNames && database.modelNames.length > 0) {
@@ -40,7 +36,19 @@ export function generateScaffoldCommand(options: ScaffoldOptions): string {
   
   // Add features
   if (features.length > 0) {
-    command += ` --features=${features.join(",")}`;
+    // Map our features to Next.js compatible flags
+    const featureMap: Record<string, string> = {
+      "auth": "--with-auth",
+      "api": "--with-api",
+      "tests": "--with-jest",
+      "docker": "--with-docker"
+    };
+    
+    features.forEach(feature => {
+      if (featureMap[feature]) {
+        command += ` ${featureMap[feature]}`;
+      }
+    });
   }
   
   return command;
