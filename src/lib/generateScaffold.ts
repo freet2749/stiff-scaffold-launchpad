@@ -13,8 +13,8 @@ export interface ScaffoldOptions {
 export function generateScaffoldCommand(options: ScaffoldOptions): string {
   const { projectName, usesDatabase, features = [], database } = options;
   
-  // Basic command structure
-  let command = `npx stifftools create ${projectName}`;
+  // Use npx create-stifftools-app instead of stifftools
+  let command = `npx create-stifftools-app ${projectName}`;
   
   // Add database flag
   if (usesDatabase) {
