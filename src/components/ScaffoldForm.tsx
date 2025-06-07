@@ -124,7 +124,7 @@ export function ScaffoldForm() {
       projectType,
       language,
       usesDatabase,
-      features: cssFramework ? [...features, cssFramework] : features,
+      features: cssFramework && cssFramework !== "none" ? [...features, cssFramework] : features,
       uploadedFiles: uploadedFiles.map(f => f.name),
     };
 
@@ -240,7 +240,7 @@ export function ScaffoldForm() {
               <SelectValue placeholder="Select a CSS framework" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {cssFrameworks.map((framework) => (
                 <SelectItem key={framework.id} value={framework.id}>
                   {framework.label}
@@ -248,7 +248,7 @@ export function ScaffoldForm() {
               ))}
             </SelectContent>
           </Select>
-          {cssFramework && (
+          {cssFramework && cssFramework !== "none" && (
             <div className="p-3 bg-muted/50 rounded-md">
               <p className="text-sm text-muted-foreground">
                 {cssFrameworks.find(f => f.id === cssFramework)?.description}
