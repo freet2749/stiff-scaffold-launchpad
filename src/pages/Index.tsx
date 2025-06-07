@@ -12,7 +12,7 @@ import { Footer } from "@/components/Footer";
 const Index = () => {
   return (
     <ThemeProvider defaultTheme="system">
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/30">
         <div className="container mx-auto px-4">
           <Header />
           
@@ -20,39 +20,47 @@ const Index = () => {
           <section className="py-16 md:py-24">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
-                  Scaffold your MVC projects in seconds
-                </h1>
-                <p className="text-xl text-muted-foreground">
-                  StiffTools helps developers quickly generate structured project templates 
-                  with a simple command line interface. Save hours on project setup.
-                </p>
+                <div className="space-y-4">
+                  <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                    ⚡ Instant Project Scaffolding
+                  </div>
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    Scaffold your projects in seconds
+                  </h1>
+                  <p className="text-xl text-muted-foreground leading-relaxed">
+                    StiffTools helps developers quickly generate structured project templates 
+                    with complete MVC architecture, database integration, and modern tooling.
+                  </p>
+                </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button size="lg" asChild>
+                  <Button size="lg" asChild className="text-lg px-8 py-3">
                     <a href="#get-started">Try It Now</a>
                   </Button>
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" className="text-lg px-8 py-3">
                     Learn More
                   </Button>
                 </div>
               </div>
               
-              <div className="terminal-window h-[300px] flex items-center justify-center">
-                <div className="space-y-4 w-full">
-                  <div className="terminal-prompt">
-                    npx stifftools create my-mvc-app
+              <div className="terminal-window h-[350px] flex items-center justify-center bg-card/50 backdrop-blur-sm">
+                <div className="space-y-4 w-full p-4">
+                  <div className="terminal-prompt text-green-400">
+                    $ npx create-stifftools-app my-mvc-app --with-db
                   </div>
                   <div className="text-muted-foreground">
-                    Creating project structure...
+                    📁 Creating project structure...
                   </div>
                   <div className="text-muted-foreground">
-                    Installing dependencies...
+                    🔧 Installing dependencies...
+                  </div>
+                  <div className="text-muted-foreground">
+                    🗄️ Setting up database models...
                   </div>
                   <div className="text-green-500">
                     ✓ Project successfully created!
                   </div>
-                  <div className="terminal-prompt flex">
-                    cd my-mvc-app
+                  <div className="terminal-prompt flex text-blue-400">
+                    $ cd my-mvc-app && npm run dev
                     <span className="animate-cursor-blink ml-1">|</span>
                   </div>
                 </div>
@@ -67,17 +75,18 @@ const Index = () => {
           <HowItWorks />
           
           {/* Get Started Section */}
-          <section id="get-started" className="py-16 border-t border-b">
+          <section id="get-started" className="py-16">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-3">Get Started</h2>
+              <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+                🚀 Get Started
+              </div>
+              <h2 className="text-3xl font-bold mb-3">Generate Your Project</h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Configure your project and generate your scaffold command
+                Configure your project settings and generate the perfect scaffold command
               </p>
             </div>
             
-            <div className="max-w-3xl mx-auto">
-              <ScaffoldForm />
-            </div>
+            <ScaffoldForm />
           </section>
           
           {/* CTA Section */}

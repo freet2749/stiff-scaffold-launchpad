@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Upload, FileCode2, CheckCircle } from "lucide-react";
 import { parseSqlFile } from "@/lib/sqlParser";
@@ -14,6 +13,37 @@ export function SqlUploadSection({ onSqlParsed }: SqlUploadSectionProps) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [parsed, setParsed] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const sqlFile = droppedFiles.find(file => file.name.endsWith('.sql'));
+    
+    if (sqlFile) {
+      setFile(sqlFile);
+      setParsed(false);
+    } else {
+      toast({
+        title: "Invalid file type",
+        description: "Please drop a .sql file",
+        variant: "destructive",
+      });
+    }
+  };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -84,8 +114,20 @@ export function SqlUploadSection({ onSqlParsed }: SqlUploadSectionProps) {
 
   return (
     <div className="space-y-4">
-      <div className="border border-dashed border-input rounded-lg p-6 text-center bg-muted/20">
-        <div className="flex flex-col items-center gap-2">
+      <div 
+        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+          dragActive 
+            ? "border-primary bg-primary/5" 
+            : parsed 
+            ? "border-green-500 bg-green-50 dark:bg-green-950/20" 
+            : "border-input hover:border-primary/50"
+        }`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <div className="flex flex-col items-center gap-3">
           {parsed ? (
             <CheckCircle className="h-10 w-10 text-green-500" />
           ) : (
@@ -96,32 +138,45 @@ export function SqlUploadSection({ onSqlParsed }: SqlUploadSectionProps) {
             {parsed ? "SQL File Parsed" : "Upload Database SQL File"}
           </h3>
           
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground mb-2">
             {parsed 
               ? "We've analyzed your database structure to help tailor your project." 
-              : "Upload your SQL schema to help us understand your database structure."
+              : "Drag and drop your SQL schema or click to browse"
             }
           </p>
           
-          <div className="flex flex-col sm:flex-row w-full gap-3">
-            <div className="flex-1">
-              <Input
-                id="sql-file"
-                type="file"
-                accept=".sql"
-                onChange={handleFileChange}
-                className="cursor-pointer"
-              />
+          {!parsed && (
+            <div className="flex flex-col sm:flex-row w-full gap-3 max-w-md">
+              <div className="flex-1">
+                <input
+                  id="sql-file"
+                  type="file"
+                  accept=".sql"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <Button variant="outline" asChild className="w-full">
+                  <label htmlFor="sql-file" className="cursor-pointer">
+                    Choose SQL File
+                  </label>
+                </Button>
+              </div>
+              <Button 
+                onClick={handleUpload} 
+                disabled={!file || uploading}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {uploading ? "Processing..." : "Parse SQL"}
+              </Button>
             </div>
-            <Button 
-              onClick={handleUpload} 
-              disabled={!file || uploading || parsed}
-              className="gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              {uploading ? "Processing..." : "Parse SQL"}
-            </Button>
-          </div>
+          )}
+
+          {file && !parsed && (
+            <p className="text-sm text-muted-foreground">
+              Selected: {file.name}
+            </p>
+          )}
         </div>
       </div>
       
