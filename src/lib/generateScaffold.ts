@@ -1,4 +1,3 @@
-
 export interface ScaffoldOptions {
   projectName: string;
   description?: string;
@@ -10,6 +9,7 @@ export interface ScaffoldOptions {
     modelNames?: string[];
   };
   language?: 'en' | 'fr';
+  uploadedFiles?: string[];
 }
 
 const translations = {
