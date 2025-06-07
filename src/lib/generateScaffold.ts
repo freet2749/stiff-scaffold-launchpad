@@ -2,6 +2,7 @@
 export interface ScaffoldOptions {
   projectName: string;
   description?: string;
+  projectType?: string;
   usesDatabase?: boolean;
   features?: string[];
   database?: {
@@ -11,44 +12,68 @@ export interface ScaffoldOptions {
 }
 
 export function generateScaffoldCommand(options: ScaffoldOptions): string {
-  const { projectName, usesDatabase, features = [], database } = options;
+  const { projectName, projectType = "vite", usesDatabase, features = [], database } = options;
   
-  // Use create-next-app which is a valid npm package
-  let command = `npx create-next-app ${projectName}`;
+  let command = "";
   
-  // Add TypeScript flag by default
-  command += " --typescript";
+  // Generate command based on project type
+  switch (projectType) {
+    case "vite":
+      command = `npm create vite@latest ${projectName}`;
+      break;
+    case "html":
+      command = `mkdir ${projectName} && cd ${projectName} && echo "<!DOCTYPE html><html><head><title>${projectName}</title></head><body><h1>Welcome to ${projectName}</h1></body></html>" > index.html`;
+      break;
+    case "cli":
+      command = `mkdir ${projectName} && cd ${projectName} && npm init -y`;
+      break;
+    case "postcss":
+      command = `npm create vite@latest ${projectName} -- --template vanilla && cd ${projectName} && npm install postcss autoprefixer`;
+      break;
+    case "php":
+      command = `mkdir ${projectName} && cd ${projectName} && echo "<?php echo 'Welcome to ${projectName}'; ?>" > index.php`;
+      break;
+    case "nextjs":
+      command = `npx create-next-app ${projectName} --typescript`;
+      break;
+    default:
+      command = `npm create vite@latest ${projectName}`;
+  }
   
-  // Add database-related flags
+  // Add database-related setup for supported frameworks
   if (usesDatabase) {
-    command += " --with-prisma";
+    if (projectType === "nextjs") {
+      command += " --with-prisma";
+    } else if (projectType === "php") {
+      command += " && echo 'Database setup: Configure your preferred PHP database connection' > database-setup.txt";
+    } else {
+      command += " && echo 'Database setup: Install your preferred database package' > database-setup.txt";
+    }
     
-    // If we have parsed database structure, add more specific flags
-    if (database?.structure) {
-      const tableCount = database.structure.tables.length;
-      
-      // Add models based on the table structure
-      if (database.modelNames && database.modelNames.length > 0) {
-        command += ` --models=${database.modelNames.join(",")}`;
-      }
+    // Add models based on the table structure
+    if (database?.modelNames && database.modelNames.length > 0) {
+      command += ` # Models: ${database.modelNames.join(", ")}`;
     }
   }
   
-  // Add features
+  // Add features based on project type
   if (features.length > 0) {
-    // Map our features to Next.js compatible flags
-    const featureMap: Record<string, string> = {
-      "auth": "--with-auth",
-      "api": "--with-api",
-      "tests": "--with-jest",
-      "docker": "--with-docker"
-    };
-    
-    features.forEach(feature => {
-      if (featureMap[feature]) {
-        command += ` ${featureMap[feature]}`;
-      }
-    });
+    if (projectType === "nextjs") {
+      const featureMap: Record<string, string> = {
+        "auth": " --with-auth",
+        "api": " --with-api",
+        "tests": " --with-jest",
+        "docker": " --with-docker"
+      };
+      
+      features.forEach(feature => {
+        if (featureMap[feature]) {
+          command += featureMap[feature];
+        }
+      });
+    } else {
+      command += ` # Features to add: ${features.join(", ")}`;
+    }
   }
   
   return command;

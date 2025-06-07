@@ -61,20 +61,26 @@
   }
 }
 
-/* Additional styling for SQL upload section */
+/* Enhanced terminal window styling */
 .terminal-window {
   background-color: hsl(var(--background));
   border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
   padding: 1rem;
   margin-top: 0.5rem;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .terminal-prompt {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  white-space: pre;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
   line-height: 1.5;
   color: hsl(var(--foreground));
+  max-width: 100%;
+  display: block;
 }
 
 .animate-cursor-blink {

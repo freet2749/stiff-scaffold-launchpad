@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { 
   ScaffoldOptions, 
   generateScaffoldCommand 
@@ -16,16 +17,30 @@ import { enhanceScaffoldOptions } from "@/lib/sqlParser";
 export function ScaffoldForm() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
+  const [projectType, setProjectType] = useState("vite");
   const [usesDatabase, setUsesDatabase] = useState(false);
   const [features, setFeatures] = useState<string[]>([]);
   const [generatedCommand, setGeneratedCommand] = useState("");
   const [dbStructure, setDbStructure] = useState<any>(null);
+
+  const projectTypes = [
+    { id: "vite", label: "Vite (Modern build tool)" },
+    { id: "html", label: "HTML/CSS/JS (Static)" },
+    { id: "cli", label: "Node.js CLI" },
+    { id: "postcss", label: "PostCSS (CSS framework)" },
+    { id: "php", label: "PHP" },
+    { id: "nextjs", label: "Next.js (React framework)" },
+  ];
 
   const availableFeatures = [
     { id: "auth", label: "Authentication" },
     { id: "api", label: "REST API" },
     { id: "tests", label: "Testing Suite" },
     { id: "docker", label: "Docker Setup" },
+    { id: "typescript", label: "TypeScript" },
+    { id: "tailwind", label: "Tailwind CSS" },
+    { id: "pwa", label: "Progressive Web App" },
+    { id: "eslint", label: "ESLint" },
   ];
 
   const handleFeatureToggle = (featureId: string) => {
@@ -38,7 +53,6 @@ export function ScaffoldForm() {
 
   const handleSqlParsed = (parsedStructure: any) => {
     setDbStructure(parsedStructure);
-    // If database wasn't already enabled, turn it on since we have a SQL file
     if (!usesDatabase) {
       setUsesDatabase(true);
     }
@@ -55,11 +69,11 @@ export function ScaffoldForm() {
     let options: ScaffoldOptions = {
       projectName,
       description,
+      projectType,
       usesDatabase,
       features,
     };
 
-    // Enhance options with database structure if available
     if (dbStructure && usesDatabase) {
       options = enhanceScaffoldOptions(options, dbStructure);
     }
@@ -88,7 +102,7 @@ export function ScaffoldForm() {
             id="project-name"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            placeholder="my-mvc-app"
+            placeholder="my-awesome-project"
           />
         </div>
         <div className="space-y-2">
@@ -111,6 +125,23 @@ export function ScaffoldForm() {
           placeholder="Describe your project here..."
           className="min-h-[100px]"
         />
+      </div>
+
+      <div className="space-y-3">
+        <Label>Project Type</Label>
+        <RadioGroup value={projectType} onValueChange={setProjectType}>
+          <div className="grid sm:grid-cols-2 gap-2">
+            {projectTypes.map((type) => (
+              <Label
+                key={type.id}
+                className="flex items-center gap-2 p-3 border rounded-md cursor-pointer hover:bg-accent"
+              >
+                <RadioGroupItem value={type.id} />
+                <span className="text-sm">{type.label}</span>
+              </Label>
+            ))}
+          </div>
+        </RadioGroup>
       </div>
 
       {usesDatabase && (
@@ -146,16 +177,16 @@ export function ScaffoldForm() {
             </Button>
           </div>
           <div className="terminal-window">
-            <code className="terminal-prompt whitespace-pre-wrap break-all">
+            <code className="terminal-prompt whitespace-pre-wrap break-words overflow-wrap-anywhere">
               {generatedCommand}
             </code>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Run this command in your terminal to scaffold your Next.js project with your selected options.
+            Run this command in your terminal to scaffold your {projectTypes.find(t => t.id === projectType)?.label} project.
           </p>
-          <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-800 p-3 rounded-md mt-4">
-            <p className="text-sm text-amber-800 dark:text-amber-300">
-              This command uses <code>create-next-app</code>, which is the official scaffolding tool for Next.js projects.
+          <div className="bg-blue-50 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-800 p-3 rounded-md mt-4">
+            <p className="text-sm text-blue-800 dark:text-blue-300">
+              Commands are tailored to your selected project type and will create the appropriate file structure.
             </p>
           </div>
         </div>
