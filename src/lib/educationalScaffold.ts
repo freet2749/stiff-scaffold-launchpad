@@ -1,4 +1,3 @@
-
 interface EducationalOptions {
   projectName: string;
   studentName?: string;
@@ -415,7 +414,7 @@ function generatePHPMVCProject(projectName: string, studentName?: string, step: 
 }
 
 function generatePHPMVCCommand(projectName: string, studentName?: string): string {
-  return `mkdir ${projectName} && cd ${projectName} && ` +
+  const command = `mkdir ${projectName} && cd ${projectName} && ` +
     `mkdir -p app/controllers app/models app/views/layouts app/views/home app/views/tasks app/config core public database && ` +
     
     // Create educational README
