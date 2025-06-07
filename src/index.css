@@ -83,6 +83,30 @@
   display: block;
 }
 
+/* New improved command container */
+.terminal-command-container {
+  background-color: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.terminal-command {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+  max-width: 100%;
+  display: block;
+  font-size: 0.875rem;
+}
+
 .animate-cursor-blink {
   animation: cursor-blink 1.2s step-end infinite;
 }
@@ -93,5 +117,16 @@
   }
   50% {
     opacity: 0;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+  .terminal-command {
+    font-size: 0.75rem;
+  }
+  
+  .terminal-command-container {
+    padding: 0.75rem;
   }
 }

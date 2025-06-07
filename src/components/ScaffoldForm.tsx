@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ScaffoldOptions, 
   generateScaffoldCommand 
@@ -18,18 +19,18 @@ export function ScaffoldForm() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("vite");
+  const [language, setLanguage] = useState<'en' | 'fr'>('en');
   const [usesDatabase, setUsesDatabase] = useState(false);
   const [features, setFeatures] = useState<string[]>([]);
   const [generatedCommand, setGeneratedCommand] = useState("");
   const [dbStructure, setDbStructure] = useState<any>(null);
 
   const projectTypes = [
-    { id: "vite", label: "Vite (Modern build tool)" },
-    { id: "html", label: "HTML/CSS/JS (Static)" },
-    { id: "cli", label: "Node.js CLI" },
-    { id: "postcss", label: "PostCSS (CSS framework)" },
-    { id: "php", label: "PHP" },
-    { id: "nextjs", label: "Next.js (React framework)" },
+    { id: "vite", label: "Vite (Modern build tool)", description: "Modern frontend build tool with TypeScript" },
+    { id: "html", label: "HTML/CSS/JS (Static)", description: "Basic static website with organized structure" },
+    { id: "cli", label: "Node.js CLI", description: "Command line interface application" },
+    { id: "postcss", label: "PostCSS (CSS framework)", description: "PostCSS with Tailwind CSS setup" },
+    { id: "php", label: "PHP MVC", description: "Complete PHP MVC structure with organized folders" },
   ];
 
   const availableFeatures = [
@@ -41,6 +42,8 @@ export function ScaffoldForm() {
     { id: "tailwind", label: "Tailwind CSS" },
     { id: "pwa", label: "Progressive Web App" },
     { id: "eslint", label: "ESLint" },
+    { id: "routing", label: "Routing System" },
+    { id: "templating", label: "Template Engine" },
   ];
 
   const handleFeatureToggle = (featureId: string) => {
@@ -70,6 +73,7 @@ export function ScaffoldForm() {
       projectName,
       description,
       projectType,
+      language,
       usesDatabase,
       features,
     };
@@ -82,7 +86,7 @@ export function ScaffoldForm() {
     setGeneratedCommand(command);
     
     toast.success("Command generated", {
-      description: "Your project scaffold command is ready"
+      description: "Your project scaffold command is ready with the proper MVC structure"
     });
   };
 
@@ -92,6 +96,8 @@ export function ScaffoldForm() {
       description: "The scaffold command is now in your clipboard."
     });
   };
+
+  const selectedProjectType = projectTypes.find(t => t.id === projectType);
 
   return (
     <div className="space-y-6">
@@ -106,14 +112,27 @@ export function ScaffoldForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label className="flex items-center gap-2">
-            <Checkbox 
-              checked={usesDatabase} 
-              onCheckedChange={(checked) => setUsesDatabase(checked === true)} 
-            />
-            <span>Include Database Setup</span>
-          </Label>
+          <Label htmlFor="language">Language</Label>
+          <Select value={language} onValueChange={(value: 'en' | 'fr') => setLanguage(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2">
+          <Checkbox 
+            checked={usesDatabase} 
+            onCheckedChange={(checked) => setUsesDatabase(checked === true)} 
+          />
+          <span>Include Database Setup</span>
+        </Label>
       </div>
 
       <div className="space-y-2">
@@ -122,7 +141,7 @@ export function ScaffoldForm() {
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Describe your project here..."
+          placeholder="Describe your project structure and requirements..."
           className="min-h-[100px]"
         />
       </div>
@@ -130,14 +149,17 @@ export function ScaffoldForm() {
       <div className="space-y-3">
         <Label>Project Type</Label>
         <RadioGroup value={projectType} onValueChange={setProjectType}>
-          <div className="grid sm:grid-cols-2 gap-2">
+          <div className="grid gap-3">
             {projectTypes.map((type) => (
               <Label
                 key={type.id}
-                className="flex items-center gap-2 p-3 border rounded-md cursor-pointer hover:bg-accent"
+                className="flex items-start gap-3 p-4 border rounded-md cursor-pointer hover:bg-accent transition-colors"
               >
-                <RadioGroupItem value={type.id} />
-                <span className="text-sm">{type.label}</span>
+                <RadioGroupItem value={type.id} className="mt-1" />
+                <div className="space-y-1">
+                  <div className="font-medium">{type.label}</div>
+                  <div className="text-sm text-muted-foreground">{type.description}</div>
+                </div>
               </Label>
             ))}
           </div>
@@ -154,7 +176,7 @@ export function ScaffoldForm() {
           {availableFeatures.map((feature) => (
             <Label
               key={feature.id}
-              className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent"
+              className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-accent transition-colors"
             >
               <Checkbox
                 checked={features.includes(feature.id)}
@@ -166,7 +188,9 @@ export function ScaffoldForm() {
         </div>
       </div>
 
-      <Button onClick={handleGenerate} className="w-full">Generate Scaffold Command</Button>
+      <Button onClick={handleGenerate} className="w-full">
+        Generate Scaffold Command
+      </Button>
 
       {generatedCommand && (
         <div className="mt-6 space-y-2">
@@ -176,17 +200,21 @@ export function ScaffoldForm() {
               Copy
             </Button>
           </div>
-          <div className="terminal-window">
-            <code className="terminal-prompt whitespace-pre-wrap break-words overflow-wrap-anywhere">
+          <div className="terminal-command-container">
+            <code className="terminal-command">
               {generatedCommand}
             </code>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Run this command in your terminal to scaffold your {projectTypes.find(t => t.id === projectType)?.label} project.
+            Run this command in your terminal to scaffold your {selectedProjectType?.label} project 
+            {projectType === 'php' ? ' with complete MVC structure' : ''}.
           </p>
           <div className="bg-blue-50 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-800 p-3 rounded-md mt-4">
             <p className="text-sm text-blue-800 dark:text-blue-300">
-              Commands are tailored to your selected project type and will create the appropriate file structure.
+              {projectType === 'php' 
+                ? 'This command creates a complete PHP MVC structure with controllers, models, views, and routing system as shown in your architecture diagram.'
+                : 'Commands are tailored to your selected project type and will create the appropriate file structure.'
+              }
             </p>
           </div>
         </div>
