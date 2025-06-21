@@ -2,47 +2,56 @@
 import { Button } from "@/components/ui/button";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/Header";
-import { EducationalScaffoldForm } from "@/components/EducationalScaffoldForm";
+import { ScaffoldForm } from "@/components/ScaffoldForm";
 import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Code, Users, Target, Lightbulb, Award } from "lucide-react";
+import { Code, Terminal, Zap, Settings, Package, Rocket } from "lucide-react";
 
 const Index = () => {
-  const teachingFeatures = [
-    {
-      icon: <BookOpen className="h-8 w-8" />,
-      title: "Structured Learning Paths",
-      description: "Follow carefully designed progressions from PHP basics to full-stack development"
-    },
+  const coreFeatures = [
     {
       icon: <Code className="h-8 w-8" />,
-      title: "Hands-On Projects",
-      description: "Build real applications while learning - from calculators to complete MVC systems"
+      title: "Multiple Project Types",
+      description: "Support for Vite, Parcel, HTML/CSS/JS, PHP MVC, and more modern frameworks"
     },
     {
-      icon: <Users className="h-8 w-8" />,
-      title: "Student-Friendly",
-      description: "Created by educators, for students - with clear explanations and step-by-step guidance"
+      icon: <Terminal className="h-8 w-8" />,
+      title: "Ready-to-Use Commands",
+      description: "Generate complete terminal commands with proper setup and configuration"
     },
     {
-      icon: <Target className="h-8 w-8" />,
-      title: "Learning Objectives",
-      description: "Every project comes with clear goals and success criteria"
+      icon: <Zap className="h-8 w-8" />,
+      title: "Modern Build Tools",
+      description: "Integration with Vite, Parcel, Tailwind CLI, PostCSS, and other modern tools"
     },
     {
-      icon: <Lightbulb className="h-8 w-8" />,
-      title: "Best Practices",
-      description: "Learn industry standards and coding conventions from day one"
+      icon: <Settings className="h-8 w-8" />,
+      title: "Smart Configuration",
+      description: "Automatic setup of TypeScript, ESLint, testing frameworks, and more"
     },
     {
-      icon: <Award className="h-8 w-8" />,
-      title: "Progressive Difficulty",
-      description: "Start with fundamentals and gradually build complex applications"
+      icon: <Package className="h-8 w-8" />,
+      title: "CSS Framework Support",
+      description: "Choose from Tailwind, Bootstrap, Bulma, or vanilla CSS setups"
+    },
+    {
+      icon: <Rocket className="h-8 w-8" />,
+      title: "Production Ready",
+      description: "Includes Docker, CI/CD templates, and deployment configurations"
     }
+  ];
+
+  const projectTypes = [
+    { name: "Vite + React", description: "Modern React development", color: "bg-blue-500" },
+    { name: "Vite + Vue", description: "Vue.js applications", color: "bg-green-500" },
+    { name: "Parcel", description: "Zero-config bundler", color: "bg-orange-500" },
+    { name: "Alpine.js", description: "Lightweight reactive framework", color: "bg-purple-500" },
+    { name: "PHP MVC", description: "Complete MVC structure", color: "bg-indigo-500" },
+    { name: "HTML/CSS/JS", description: "Static website setup", color: "bg-gray-500" }
   ];
 
   return (
@@ -51,71 +60,71 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <Header />
           
-          {/* Hero Section - Educational Focus */}
+          {/* Hero Section */}
           <section className="py-16 md:py-24">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
                 <div className="space-y-4">
                   <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-                    🎓 Learn by Building
+                    🚀 Build Faster
                   </div>
                   <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Master Web Development Through Practice
+                    Generate Perfect Project Structures
                   </h1>
                   <p className="text-xl text-muted-foreground leading-relaxed">
-                    A learning-focused project generator designed for computer science students. 
-                    Build real applications while mastering PHP, MVC architecture, and modern web development.
+                    Create complete web project scaffolds with modern build tools, frameworks, and configurations. 
+                    From simple HTML to complex MVC architectures.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button size="lg" asChild className="text-lg px-8 py-3">
-                    <a href="#start-learning">Start Learning</a>
+                    <a href="#generator">Start Building</a>
                   </Button>
                   <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-                    View Learning Paths
+                    View Examples
                   </Button>
                 </div>
                 
-                {/* Learning Stats */}
+                {/* Stats */}
                 <div className="flex gap-6 pt-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">4</div>
-                    <div className="text-sm text-muted-foreground">Learning Paths</div>
+                    <div className="text-2xl font-bold text-primary">10+</div>
+                    <div className="text-sm text-muted-foreground">Project Types</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary">15+</div>
-                    <div className="text-sm text-muted-foreground">Practice Projects</div>
+                    <div className="text-sm text-muted-foreground">Build Tools</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">50+</div>
-                    <div className="text-sm text-muted-foreground">Code Examples</div>
+                    <div className="text-2xl font-bold text-primary">8+</div>
+                    <div className="text-sm text-muted-foreground">CSS Frameworks</div>
                   </div>
                 </div>
               </div>
               
               <div className="terminal-window h-[400px] flex items-center justify-center bg-card/50 backdrop-blur-sm">
                 <div className="space-y-4 w-full p-6">
-                  <div className="text-primary font-semibold mb-2">🎯 Learning Project Generated!</div>
+                  <div className="text-primary font-semibold mb-2">🎯 Project Generated!</div>
                   <div className="terminal-prompt text-green-400">
-                    $ php-learning-project my-mvc-app
+                    $ npm create vite@latest my-app -- --template react-ts
                   </div>
                   <div className="text-muted-foreground">
-                    📚 Creating educational structure...
+                    ⚡ Creating modern React project...
                   </div>
                   <div className="text-muted-foreground">
-                    ⚡ Adding learning exercises...
+                    📦 Installing Tailwind CSS...
                   </div>
                   <div className="text-muted-foreground">
-                    🗄️ Setting up database examples...
+                    🔧 Setting up TypeScript...
                   </div>
                   <div className="text-muted-foreground">
-                    📝 Generating practice assignments...
+                    ✨ Configuring ESLint & Prettier...
                   </div>
                   <div className="text-green-500">
-                    ✓ Ready to learn! Check README.md for instructions
+                    ✓ Project ready! Run 'npm run dev' to start
                   </div>
                   <div className="terminal-prompt text-blue-400 flex">
-                    $ cd my-mvc-app && php -S localhost:8000
+                    $ cd my-app && npm run dev
                     <span className="animate-cursor-blink ml-1">|</span>
                   </div>
                 </div>
@@ -123,20 +132,20 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Teaching-Focused Features */}
+          {/* Core Features */}
           <section className="py-16">
             <div className="text-center mb-12">
               <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-                🚀 For Students, By Educators
+                🛠️ Powerful Features
               </div>
-              <h2 className="text-3xl font-bold mb-3">Learn Web Development the Right Way</h2>
+              <h2 className="text-3xl font-bold mb-3">Everything You Need to Start Building</h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Our educational approach combines theory with practice, helping you build real skills through guided projects
+                Generate complete project structures with modern tooling and best practices built-in
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {teachingFeatures.map((feature, index) => (
+              {coreFeatures.map((feature, index) => (
                 <Card key={index} className="transition-all hover:shadow-lg hover:scale-105">
                   <CardHeader>
                     <div className="flex items-center gap-3">
@@ -154,59 +163,46 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Learning Path Preview */}
+          {/* Supported Project Types */}
           <section className="py-16">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-3">Choose Your Learning Journey</h2>
+              <h2 className="text-3xl font-bold mb-3">Supported Project Types</h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Structured paths designed to take you from beginner to advanced developer
+                From simple static sites to complex full-stack applications
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { title: "PHP Fundamentals", level: "Beginner", duration: "2-3 weeks", projects: 3 },
-                { title: "PHP MVC", level: "Intermediate", duration: "4-6 weeks", projects: 5 },
-                { title: "Modern Frontend", level: "Intermediate", duration: "6-8 weeks", projects: 4 },
-                { title: "Full-Stack", level: "Advanced", duration: "8-12 weeks", projects: 3 }
-              ].map((path, index) => (
-                <Card key={index} className="text-center">
-                  <CardHeader>
-                    <div className="mx-auto w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-2">
-                      {index + 1}
-                    </div>
-                    <CardTitle className="text-lg">{path.title}</CardTitle>
-                    <div className="flex justify-center gap-2">
-                      <Badge variant="outline">{path.level}</Badge>
-                    </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {projectTypes.map((type, index) => (
+                <Card key={index} className="text-center relative overflow-hidden">
+                  <div className={`absolute top-0 left-0 w-full h-1 ${type.color}`}></div>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">{type.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <div>⏱️ {path.duration}</div>
-                      <div>🛠️ {path.projects} projects</div>
-                    </div>
+                    <CardDescription>{type.description}</CardDescription>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </section>
           
-          {/* How It Works - Educational Version */}
+          {/* How It Works */}
           <HowItWorks />
           
-          {/* Main Learning Interface */}
-          <section id="start-learning" className="py-16">
+          {/* Main Generator Interface */}
+          <section id="generator" className="py-16">
             <div className="text-center mb-12">
               <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-                🎯 Start Your Journey
+                🎯 Project Generator
               </div>
-              <h2 className="text-3xl font-bold mb-3">Create Your Learning Project</h2>
+              <h2 className="text-3xl font-bold mb-3">Create Your Project</h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Choose a learning path that matches your skill level and start building real applications
+                Configure your project settings and generate the perfect scaffold command
               </p>
             </div>
             
-            <EducationalScaffoldForm />
+            <ScaffoldForm />
           </section>
           
           {/* CTA Section */}

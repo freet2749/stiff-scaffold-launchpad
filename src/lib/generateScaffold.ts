@@ -4,6 +4,8 @@ export interface ScaffoldOptions {
   projectType?: string;
   usesDatabase?: boolean;
   features?: string[];
+  cssFramework?: string;
+  buildTool?: string;
   database?: {
     structure?: any;
     modelNames?: string[];
@@ -18,95 +20,134 @@ const translations = {
     databaseSetup: "Database setup: Configure your preferred database connection",
     installPackage: "Database setup: Install your preferred database package",
     models: "Models",
-    features: "Features to add"
+    features: "Features to add",
+    created: "Created",
+    installing: "Installing dependencies",
+    configuring: "Configuring"
   },
   fr: {
     welcome: "Bienvenue dans",
     databaseSetup: "Configuration base de données: Configurez votre connexion de base de données préférée",
     installPackage: "Configuration base de données: Installez votre package de base de données préféré",
     models: "Modèles",
-    features: "Fonctionnalités à ajouter"
+    features: "Fonctionnalités à ajouter",
+    created: "Créé",
+    installing: "Installation des dépendances",
+    configuring: "Configuration"
   }
 };
 
 export function generateScaffoldCommand(options: ScaffoldOptions): string {
-  const { projectName, projectType = "vite", usesDatabase, features = [], database, language = 'en', uploadedFiles = [] } = options;
-  const t = translations[language];
+  const { 
+    projectName, 
+    projectType = "vite-react", 
+    usesDatabase, 
+    features = [], 
+    cssFramework,
+    buildTool,
+    database, 
+    language = 'en', 
+    uploadedFiles = [] 
+  } = options;
   
+  const t = translations[language];
   let command = "";
   let dependencies: string[] = [];
+  let postInstallCommands: string[] = [];
   
-  // Generate command based on project type
+  // Generate command based on project type and build tool
   switch (projectType) {
-    case "vite":
-      command = `npm create vite@latest ${projectName} -- --template vanilla-ts`;
+    case "vite-react":
+      command = `npm create vite@latest ${projectName} -- --template react-ts`;
+      dependencies.push("cd " + projectName);
       dependencies.push("npm install");
+      break;
       
-      // Add CSS framework
-      if (features.includes("tailwind")) {
-        dependencies.push("npm install -D tailwindcss postcss autoprefixer");
-        dependencies.push("npx tailwindcss init -p");
-      } else if (features.includes("bootstrap")) {
-        dependencies.push("npm install bootstrap");
-      }
+    case "vite-vue":
+      command = `npm create vite@latest ${projectName} -- --template vue-ts`;
+      dependencies.push("cd " + projectName);
+      dependencies.push("npm install");
+      break;
       
-      // Add other features
-      if (features.includes("typescript")) dependencies.push("npm install -D typescript @types/node");
-      if (features.includes("eslint")) dependencies.push("npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin");
-      if (features.includes("tests")) dependencies.push("npm install -D vitest @testing-library/dom");
+    case "vite-svelte":
+      command = `npm create vite@latest ${projectName} -- --template svelte-ts`;
+      dependencies.push("cd " + projectName);
+      dependencies.push("npm install");
+      break;
+      
+    case "vite-vanilla":
+      command = `npm create vite@latest ${projectName} -- --template vanilla-ts`;
+      dependencies.push("cd " + projectName);
+      dependencies.push("npm install");
+      break;
+      
+    case "parcel":
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      dependencies.push("npm init -y");
+      dependencies.push("npm install --save-dev parcel");
+      dependencies.push("mkdir src");
+      postInstallCommands.push(`echo "<!DOCTYPE html><html><head><title>${projectName}</title></head><body><div id='app'></div><script type='module' src='./src/index.ts'></script></body></html>" > index.html`);
+      postInstallCommands.push(`echo "console.log('${t.welcome} ${projectName}!');" > src/index.ts`);
+      break;
+      
+    case "alpine":
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      postInstallCommands.push(`echo "<!DOCTYPE html><html lang='${language}'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>${projectName}</title><script defer src='https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'></script></head><body><div x-data='{ message: \\"${t.welcome} ${projectName}\\" }'><h1 x-text='message'></h1></div></body></html>" > index.html`);
+      break;
+      
+    case "tailwind-cli":
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      dependencies.push("npm init -y");
+      dependencies.push("npm install -D tailwindcss");
+      dependencies.push("npx tailwindcss init");
+      postInstallCommands.push("mkdir src");
+      postInstallCommands.push(`echo "@tailwind base; @tailwind components; @tailwind utilities;" > src/input.css`);
+      postInstallCommands.push(`echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>${projectName}</title><link href='./dist/output.css' rel='stylesheet'></head><body><h1 class='text-3xl font-bold underline'>${t.welcome} ${projectName}</h1></body></html>" > index.html`);
+      break;
+      
+    case "astro":
+      command = `npm create astro@latest ${projectName}`;
+      dependencies.push("cd " + projectName);
+      dependencies.push("npm install");
+      break;
+      
+    case "eleventy":
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      dependencies.push("npm init -y");
+      dependencies.push("npm install --save-dev @11ty/eleventy");
+      postInstallCommands.push("mkdir src");
+      postInstallCommands.push(`echo "# ${projectName}" > src/index.md`);
       break;
       
     case "html":
-      command = `mkdir ${projectName} && cd ${projectName} && ` +
-        `mkdir css js images assets && ` +
-        `echo "<!DOCTYPE html><html lang='${language}'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>${projectName}</title><link rel='stylesheet' href='css/style.css'></head><body><header><nav><h1>${t.welcome} ${projectName}</h1></nav></header><main><section id='content'><p>Your content here</p></section></main><footer><p>&copy; 2024 ${projectName}</p></footer><script src='js/main.js'></script></body></html>" > index.html && ` +
-        `echo "/* ${projectName} Styles */ * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Arial, sans-serif; line-height: 1.6; } header { background: #333; color: white; padding: 1rem; } main { padding: 2rem; min-height: 80vh; } footer { background: #333; color: white; text-align: center; padding: 1rem; }" > css/style.css && ` +
-        `echo "// ${projectName} JavaScript console.log('${t.welcome} ${projectName}!');" > js/main.js`;
-        
-      // Add CSS framework for HTML projects
-      if (features.includes("bootstrap")) {
-        command += ` && echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">' >> index.html`;
-      }
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      postInstallCommands.push("mkdir css js images assets");
+      postInstallCommands.push(`echo "<!DOCTYPE html><html lang='${language}'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>${projectName}</title><link rel='stylesheet' href='css/style.css'></head><body><header><nav><h1>${t.welcome} ${projectName}</h1></nav></header><main><section id='content'><p>Your content here</p></section></main><footer><p>&copy; 2024 ${projectName}</p></footer><script src='js/main.js'></script></body></html>" > index.html`);
+      postInstallCommands.push(`echo "/* ${projectName} Styles */ * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Arial, sans-serif; line-height: 1.6; } header { background: #333; color: white; padding: 1rem; } main { padding: 2rem; min-height: 80vh; } footer { background: #333; color: white; text-align: center; padding: 1rem; }" > css/style.css`);
+      postInstallCommands.push(`echo "// ${projectName} JavaScript\\nconsole.log('${t.welcome} ${projectName}!');" > js/main.js`);
       break;
       
     case "cli":
-      command = `mkdir ${projectName} && cd ${projectName} && ` +
-        `npm init -y && ` +
-        `mkdir src bin lib && ` +
-        `echo "#!/usr/bin/env node" > bin/${projectName} && ` +
-        `echo "const { program } = require('commander'); program.version('1.0.0').description('${projectName} CLI'); program.command('start').description('Start the application').action(() => { console.log('${t.welcome} ${projectName} CLI!'); }); program.parse();" > src/index.js && ` +
-        `chmod +x bin/${projectName} && ` +
-        `npm install commander`;
-      break;
-      
-    case "postcss":
-      command = `npm create vite@latest ${projectName} -- --template vanilla && cd ${projectName} && ` +
-        `npm install postcss autoprefixer tailwindcss && ` +
-        `mkdir src/styles src/components && ` +
-        `echo "@tailwind base; @tailwind components; @tailwind utilities;" > src/styles/main.css && ` +
-        `npx tailwindcss init -p`;
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      dependencies.push("npm init -y");
+      dependencies.push("npm install commander");
+      postInstallCommands.push("mkdir src bin lib");
+      postInstallCommands.push(`echo "#!/usr/bin/env node" > bin/${projectName}`);
+      postInstallCommands.push(`echo "const { program } = require('commander'); program.version('1.0.0').description('${projectName} CLI'); program.command('start').description('Start the application').action(() => { console.log('${t.welcome} ${projectName} CLI!'); }); program.parse();" > src/index.js`);
+      postInstallCommands.push(`chmod +x bin/${projectName}`);
       break;
       
     case "php":
-      // Create comprehensive PHP MVC structure
       command = `mkdir ${projectName} && cd ${projectName} && ` +
-        // Create directory structure
         `mkdir -p app/config app/controllers app/models app/routers app/views/templates/partials core public && ` +
-        
-        // Create public/index.php (entry point)
         `echo "<?php require_once '../core/init.php'; ?>" > public/index.php && ` +
-        
-        // Create core/init.php
         `echo "<?php
 session_start();
 require_once 'connexion.php';
 require_once '../app/config/params.php';
 require_once '../app/routers/index.php';
 ?>" > core/init.php && ` +
-        
-        // Create core/connexion.php
         `echo "<?php
-// Database connection
 class Database {
     private static \\$instance = null;
     private \\$pdo;
@@ -136,23 +177,16 @@ class Database {
     }
 }
 ?>" > core/connexion.php && ` +
-        
-        // Create app/config/params.php
         `echo "<?php
-// Application parameters
 \\$content = '';
 define('APP_NAME', '${projectName}');
 define('BASE_URL', '/');
 define('ASSETS_URL', BASE_URL . 'public/assets/');
 ?>" > app/config/params.php && ` +
-        
-        // Create app/routers/index.php
         `echo "<?php
-// Router configuration
 \\$action = \\$_GET['action'] ?? 'home';
 \\$controller = \\$_GET['controller'] ?? 'pages';
 
-// Basic routing
 switch (\\$controller) {
     case 'pages':
         require_once '../app/controllers/PagesController.php';
@@ -173,11 +207,8 @@ switch (\\$controller) {
         break;
 }
 
-// Load template
 require_once '../app/views/templates/index.php';
 ?>" > app/routers/index.php && ` +
-        
-        // Create app/views/templates/index.php
         `echo "<!DOCTYPE html>
 <html lang='${language}'>
 <head>
@@ -207,8 +238,6 @@ require_once '../app/views/templates/index.php';
     </footer>
 </body>
 </html>" > app/views/templates/index.php && ` +
-        
-        // Create a sample controller
         `echo "<?php
 class PagesController {
     public function homeAction() {
@@ -217,73 +246,114 @@ class PagesController {
     }
 }
 ?>" > app/controllers/PagesController.php`;
-
-        // Add database models if SQL was uploaded
-        if (database?.modelNames && database.modelNames.length > 0) {
-          database.modelNames.forEach((modelName: string) => {
-            command += ` && echo "<?php
-class ${modelName} {
-    private \\$db;
-    
-    public function __construct() {
-        \\$this->db = Database::getInstance()->getConnection();
-    }
-    
-    public function findAll() {
-        \\$stmt = \\$this->db->query('SELECT * FROM ${modelName.toLowerCase()}s');
-        return \\$stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    public function findById(\\$id) {
-        \\$stmt = \\$this->db->prepare('SELECT * FROM ${modelName.toLowerCase()}s WHERE id = ?');
-        \\$stmt->execute([\\$id]);
-        return \\$stmt->fetch(PDO::FETCH_ASSOC);
-    }
-}
-?>" > app/models/${modelName}.php`;
-          });
-        }
       break;
       
     default:
-      command = `npm create vite@latest ${projectName}`;
+      command = `npm create vite@latest ${projectName} -- --template react-ts`;
+      dependencies.push("cd " + projectName);
+      dependencies.push("npm install");
   }
   
-  // Add database-related setup for supported frameworks
+  // Add CSS framework setup
+  if (cssFramework && cssFramework !== "none") {
+    switch (cssFramework) {
+      case "tailwind":
+        if (!projectType.includes("tailwind") && projectType !== "php" && projectType !== "html") {
+          dependencies.push("npm install -D tailwindcss postcss autoprefixer");
+          dependencies.push("npx tailwindcss init -p");
+        }
+        break;
+      case "bootstrap":
+        if (projectType === "html") {
+          postInstallCommands.push(`echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">' >> index.html`);
+        } else if (projectType !== "php") {
+          dependencies.push("npm install bootstrap");
+        }
+        break;
+      case "bulma":
+        if (projectType === "html") {
+          postInstallCommands.push(`echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">' >> index.html`);
+        } else if (projectType !== "php") {
+          dependencies.push("npm install bulma");
+        }
+        break;
+      case "unocss":
+        if (projectType !== "php" && projectType !== "html") {
+          dependencies.push("npm install -D unocss");
+        }
+        break;
+    }
+  }
+  
+  // Add additional features
+  features.forEach(feature => {
+    switch (feature) {
+      case "typescript":
+        if (!projectType.includes("ts") && projectType !== "php" && projectType !== "html") {
+          dependencies.push("npm install -D typescript @types/node");
+        }
+        break;
+      case "eslint":
+        if (projectType !== "php" && projectType !== "html") {
+          dependencies.push("npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin");
+        }
+        break;
+      case "prettier":
+        if (projectType !== "php" && projectType !== "html") {
+          dependencies.push("npm install -D prettier");
+        }
+        break;
+      case "tests":
+        if (projectType.includes("vite")) {
+          dependencies.push("npm install -D vitest @testing-library/react @testing-library/jest-dom");
+        } else if (projectType !== "php" && projectType !== "html") {
+          dependencies.push("npm install -D jest @types/jest");
+        }
+        break;
+      case "pwa":
+        if (projectType.includes("vite")) {
+          dependencies.push("npm install -D vite-plugin-pwa");
+        }
+        break;
+      case "docker":
+        postInstallCommands.push(`echo "FROM node:18-alpine\\nWORKDIR /app\\nCOPY package*.json ./\\nRUN npm install\\nCOPY . .\\nEXPOSE 3000\\nCMD [\\"npm\\", \\"run\\", \\"dev\\"]" > Dockerfile`);
+        break;
+    }
+  });
+  
+  // Add database setup
   if (usesDatabase) {
     if (projectType === "php") {
       command += ` && echo "# ${t.databaseSetup}" > README.md`;
-    } else {
-      command += ` && cd ${projectName} && ${t.installPackage}`;
-      if (projectType === "vite" || projectType === "postcss") {
-        dependencies.push("npm install prisma @prisma/client");
-        dependencies.push("npx prisma init");
-      }
+    } else if (projectType !== "html") {
+      dependencies.push("npm install prisma @prisma/client");
+      dependencies.push("npx prisma init");
     }
     
-    // Add models based on the table structure
     if (database?.modelNames && database.modelNames.length > 0) {
       command += ` # ${t.models}: ${database.modelNames.join(", ")}`;
     }
   }
   
-  // Add dependencies and setup commands
-  if (dependencies.length > 0 && projectType !== "html" && projectType !== "php") {
-    command += ` && cd ${projectName} && ${dependencies.join(" && ")}`;
+  // Combine all commands
+  let fullCommand = command;
+  
+  if (dependencies.length > 0) {
+    fullCommand += " && " + dependencies.join(" && ");
   }
   
-  // Add features based on project type
+  if (postInstallCommands.length > 0) {
+    fullCommand += " && " + postInstallCommands.join(" && ");
+  }
+  
+  // Add final setup message
   if (features.length > 0) {
-    const featureDescriptions = features.filter(f => !["tailwind", "bootstrap", "bulma", "materialize"].includes(f));
-    if (featureDescriptions.length > 0) {
-      command += ` # ${t.features}: ${featureDescriptions.join(", ")}`;
-    }
+    fullCommand += ` # ${t.features}: ${features.join(", ")}`;
   }
   
-  // Add note about uploaded files
   if (uploadedFiles.length > 0) {
-    command += ` # Additional files: ${uploadedFiles.join(", ")}`;
+    fullCommand += ` # Additional files: ${uploadedFiles.join(", ")}`;
   }
   
-  return command;
+  return fullCommand;
 }

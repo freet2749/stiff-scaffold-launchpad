@@ -11,7 +11,7 @@ import {
   ScaffoldOptions, 
   generateScaffoldCommand 
 } from "@/lib/generateScaffold";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/ui/use-toast";
 import { SqlUploadSection } from "./SqlUploadSection";
 import { FileUploadSection } from "./FileUploadSection";
 import { enhanceScaffoldOptions } from "@/lib/sqlParser";
@@ -19,7 +19,7 @@ import { enhanceScaffoldOptions } from "@/lib/sqlParser";
 export function ScaffoldForm() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
-  const [projectType, setProjectType] = useState("vite");
+  const [projectType, setProjectType] = useState("vite-react");
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
   const [usesDatabase, setUsesDatabase] = useState(false);
   const [features, setFeatures] = useState<string[]>([]);
@@ -29,65 +29,117 @@ export function ScaffoldForm() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const projectTypes = [
-    { id: "vite", label: "Vite (Modern build tool)", description: "Modern frontend build tool with TypeScript" },
-    { id: "html", label: "HTML/CSS/JS (Static)", description: "Basic static website with organized structure" },
-    { id: "cli", label: "Node.js CLI", description: "Command line interface application" },
-    { id: "postcss", label: "PostCSS", description: "PostCSS with build tools setup" },
-    { id: "php", label: "PHP MVC", description: "Complete PHP MVC structure with organized folders" },
+    { 
+      id: "vite-react", 
+      label: "Vite + React", 
+      description: "Modern React development with TypeScript and hot reload",
+      category: "Frontend Frameworks"
+    },
+    { 
+      id: "vite-vue", 
+      label: "Vite + Vue", 
+      description: "Vue.js with composition API and TypeScript support",
+      category: "Frontend Frameworks"
+    },
+    { 
+      id: "vite-svelte", 
+      label: "Vite + Svelte", 
+      description: "Svelte framework with modern build tooling",
+      category: "Frontend Frameworks"
+    },
+    { 
+      id: "vite-vanilla", 
+      label: "Vite + Vanilla", 
+      description: "Pure JavaScript/TypeScript with Vite bundling",
+      category: "Frontend Frameworks"
+    },
+    { 
+      id: "parcel", 
+      label: "Parcel", 
+      description: "Zero-configuration build tool for web applications",
+      category: "Build Tools"
+    },
+    { 
+      id: "alpine", 
+      label: "Alpine.js", 
+      description: "Lightweight reactive framework for HTML enhancement",
+      category: "Lightweight"
+    },
+    { 
+      id: "tailwind-cli", 
+      label: "Tailwind CLI", 
+      description: "Standalone Tailwind CSS with CLI compilation",
+      category: "CSS First"
+    },
+    { 
+      id: "astro", 
+      label: "Astro", 
+      description: "Static site generator with component islands",
+      category: "Static Site"
+    },
+    { 
+      id: "eleventy", 
+      label: "Eleventy (11ty)", 
+      description: "Simple static site generator with flexible templating",
+      category: "Static Site"
+    },
+    { 
+      id: "html", 
+      label: "HTML/CSS/JS", 
+      description: "Traditional static website with organized folder structure",
+      category: "Static"
+    },
+    { 
+      id: "cli", 
+      label: "Node.js CLI", 
+      description: "Command line interface application with Commander.js",
+      category: "CLI"
+    },
+    { 
+      id: "php", 
+      label: "PHP MVC", 
+      description: "Complete PHP MVC structure with database integration",
+      category: "Backend"
+    },
   ];
 
   const cssFrameworks = [
     { id: "tailwind", label: "Tailwind CSS", description: "Utility-first CSS framework" },
     { id: "bootstrap", label: "Bootstrap", description: "Popular CSS framework with components" },
     { id: "bulma", label: "Bulma", description: "Modern CSS framework based on Flexbox" },
-    { id: "materialize", label: "Materialize", description: "CSS framework based on Material Design" },
+    { id: "unocss", label: "UnoCSS", description: "Instant on-demand atomic CSS engine" },
   ];
 
   const coreFeatures = [
     { 
-      id: "auth", 
-      label: "Authentication", 
-      description: "User login/logout system with session management and security features" 
-    },
-    { 
-      id: "api", 
-      label: "REST API", 
-      description: "RESTful API endpoints with proper HTTP methods and JSON responses" 
-    },
-    { 
-      id: "tests", 
-      label: "Testing Suite", 
-      description: "Unit and integration testing setup with testing frameworks" 
-    },
-    { 
-      id: "docker", 
-      label: "Docker Setup", 
-      description: "Containerization with Dockerfile and docker-compose configuration" 
-    },
-    { 
       id: "typescript", 
       label: "TypeScript", 
-      description: "Static type checking for JavaScript with TypeScript configuration" 
-    },
-    { 
-      id: "pwa", 
-      label: "Progressive Web App", 
-      description: "Service worker, manifest, and offline capabilities for web apps" 
+      description: "Static type checking for JavaScript" 
     },
     { 
       id: "eslint", 
       label: "ESLint", 
-      description: "Code linting and formatting with ESLint and Prettier configuration" 
+      description: "Code linting and quality checks" 
     },
     { 
-      id: "routing", 
-      label: "Routing System", 
-      description: "URL routing and navigation management for single-page applications" 
+      id: "prettier", 
+      label: "Prettier", 
+      description: "Code formatting and style consistency" 
     },
     { 
-      id: "templating", 
-      label: "Template Engine", 
-      description: "Dynamic HTML generation with template engine integration" 
+      id: "tests", 
+      label: "Testing Setup", 
+      description: "Unit and integration testing framework" 
+    },
+    { 
+      id: "pwa", 
+      label: "Progressive Web App", 
+      description: "Service worker and offline capabilities" 
+    },
+    { 
+      id: "docker", 
+      label: "Docker", 
+      description: "Containerization with Dockerfile" 
     },
   ];
 
@@ -112,8 +164,10 @@ export function ScaffoldForm() {
 
   const handleGenerate = () => {
     if (!projectName) {
-      toast.error("Project name required", {
-        description: "Please enter a project name to generate a scaffold command"
+      toast({
+        title: "Project name required",
+        description: "Please enter a project name to generate a scaffold command",
+        variant: "destructive",
       });
       return;
     }
@@ -124,7 +178,8 @@ export function ScaffoldForm() {
       projectType,
       language,
       usesDatabase,
-      features: cssFramework && cssFramework !== "none" ? [...features, cssFramework] : features,
+      features,
+      cssFramework: cssFramework && cssFramework !== "none" ? cssFramework : undefined,
       uploadedFiles: uploadedFiles.map(f => f.name),
     };
 
@@ -135,19 +190,26 @@ export function ScaffoldForm() {
     const command = generateScaffoldCommand(options);
     setGeneratedCommand(command);
     
-    toast.success("Command generated", {
-      description: "Your project scaffold command is ready with the proper structure"
+    toast({
+      title: "Command generated",
+      description: "Your project scaffold command is ready to use",
     });
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedCommand);
-    toast.success("Copied to clipboard!", {
-      description: "The scaffold command is now in your clipboard."
+    toast({
+      title: "Copied to clipboard!",
+      description: "The scaffold command is now in your clipboard.",
     });
   };
 
   const selectedProjectType = projectTypes.find(t => t.id === projectType);
+  const groupedProjectTypes = projectTypes.reduce((acc, type) => {
+    if (!acc[type.category]) acc[type.category] = [];
+    acc[type.category].push(type);
+    return acc;
+  }, {} as Record<string, typeof projectTypes>);
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-card rounded-lg border">
@@ -155,7 +217,7 @@ export function ScaffoldForm() {
         {/* Header */}
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-bold">Project Scaffold Generator</h2>
-          <p className="text-muted-foreground">Configure your project and generate the perfect command</p>
+          <p className="text-muted-foreground">Configure your project and generate the perfect setup command</p>
         </div>
 
         {/* Basic Info */}
@@ -191,7 +253,7 @@ export function ScaffoldForm() {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your project structure and requirements..."
+            placeholder="Describe your project and any specific requirements..."
             className="min-h-[120px]"
           />
           <FileUploadSection onFilesUploaded={handleFilesUploaded} />
@@ -215,18 +277,27 @@ export function ScaffoldForm() {
         <div className="space-y-4">
           <Label className="text-base font-medium">Project Type</Label>
           <RadioGroup value={projectType} onValueChange={setProjectType}>
-            <div className="grid gap-3">
-              {projectTypes.map((type) => (
-                <Label
-                  key={type.id}
-                  className="flex items-start gap-4 p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
-                >
-                  <RadioGroupItem value={type.id} className="mt-1" />
-                  <div className="space-y-1">
-                    <div className="font-medium text-base">{type.label}</div>
-                    <div className="text-sm text-muted-foreground">{type.description}</div>
+            <div className="space-y-6">
+              {Object.entries(groupedProjectTypes).map(([category, types]) => (
+                <div key={category} className="space-y-3">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                    {category}
+                  </h4>
+                  <div className="grid gap-3">
+                    {types.map((type) => (
+                      <Label
+                        key={type.id}
+                        className="flex items-start gap-4 p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+                      >
+                        <RadioGroupItem value={type.id} className="mt-1" />
+                        <div className="space-y-1">
+                          <div className="font-medium text-base">{type.label}</div>
+                          <div className="text-sm text-muted-foreground">{type.description}</div>
+                        </div>
+                      </Label>
+                    ))}
                   </div>
-                </Label>
+                </div>
               ))}
             </div>
           </RadioGroup>
@@ -259,7 +330,7 @@ export function ScaffoldForm() {
 
         {/* Core Features */}
         <div className="space-y-4">
-          <Label className="text-base font-medium">Core Features</Label>
+          <Label className="text-base font-medium">Additional Features</Label>
           <div className="grid sm:grid-cols-2 gap-3">
             {coreFeatures.map((feature) => (
               <div key={feature.id} className="space-y-2">
@@ -303,11 +374,10 @@ export function ScaffoldForm() {
             </div>
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>
-                Run this command in your terminal to scaffold your {selectedProjectType?.label} project 
-                {projectType === 'php' ? ' with complete MVC structure' : ''}.
+                Run this command in your terminal to create your {selectedProjectType?.label} project.
               </p>
               {features.length > 0 && (
-                <p>Selected features: {features.join(", ")}</p>
+                <p>Included features: {features.join(", ")}</p>
               )}
             </div>
           </div>
