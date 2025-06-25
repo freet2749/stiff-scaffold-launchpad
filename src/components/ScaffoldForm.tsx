@@ -54,18 +54,6 @@ export function ScaffoldForm() {
       category: "Lightweight"
     },
     { 
-      id: "eleventy", 
-      label: "Eleventy (11ty)", 
-      description: "Simple static site generator with flexible templating",
-      category: "Static Site"
-    },
-    { 
-      id: "cli", 
-      label: "Node.js CLI", 
-      description: "Command line interface application",
-      category: "CLI"
-    },
-    { 
       id: "wordpress", 
       label: "WordPress Theme", 
       description: "Custom WordPress theme structure",
