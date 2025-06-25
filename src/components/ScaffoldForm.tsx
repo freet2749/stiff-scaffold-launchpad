@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +20,7 @@ export function ScaffoldForm() {
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("vite-react");
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
+  const [osType, setOsType] = useState<'windows' | 'mac' | 'linux'>('windows');
   const [usesDatabase, setUsesDatabase] = useState(false);
   const [features, setFeatures] = useState<string[]>([]);
   const [cssFramework, setCssFramework] = useState("");
@@ -177,6 +177,7 @@ export function ScaffoldForm() {
       description,
       projectType,
       language,
+      osType,
       usesDatabase,
       features,
       cssFramework: cssFramework && cssFramework !== "none" ? cssFramework : undefined,
@@ -221,7 +222,7 @@ export function ScaffoldForm() {
         </div>
 
         {/* Basic Info */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="project-name" className="text-base font-medium">Project Name</Label>
             <Input
@@ -241,6 +242,19 @@ export function ScaffoldForm() {
               <SelectContent>
                 <SelectItem value="en">English</SelectItem>
                 <SelectItem value="fr">Français</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="os-type" className="text-base font-medium">Operating System</Label>
+            <Select value={osType} onValueChange={(value: 'windows' | 'mac' | 'linux') => setOsType(value)}>
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Select OS" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="windows">Windows</SelectItem>
+                <SelectItem value="mac">macOS</SelectItem>
+                <SelectItem value="linux">Linux</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -362,7 +376,7 @@ export function ScaffoldForm() {
         {generatedCommand && (
           <div className="space-y-4 p-6 bg-muted/30 rounded-lg border">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-medium">Generated Command</Label>
+              <Label className="text-base font-medium">Generated Command ({osType})</Label>
               <Button variant="outline" size="sm" onClick={copyToClipboard}>
                 Copy Command
               </Button>
@@ -374,7 +388,7 @@ export function ScaffoldForm() {
             </div>
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>
-                Run this command in your terminal to create your {selectedProjectType?.label} project.
+                Run this command in your {osType} terminal to create your {selectedProjectType?.label} project.
               </p>
               {features.length > 0 && (
                 <p>Included features: {features.join(", ")}</p>
