@@ -18,7 +18,7 @@ import { enhanceScaffoldOptions } from "@/lib/sqlParser";
 export function ScaffoldForm() {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
-  const [projectType, setProjectType] = useState("vite-react");
+  const [projectType, setProjectType] = useState("html");
   const [language, setLanguage] = useState<'en' | 'fr'>('en');
   const [osType, setOsType] = useState<'windows' | 'mac' | 'linux'>('windows');
   const [usesDatabase, setUsesDatabase] = useState(false);
@@ -30,34 +30,22 @@ export function ScaffoldForm() {
 
   const projectTypes = [
     { 
-      id: "vite-react", 
-      label: "Vite + React", 
-      description: "Modern React development with TypeScript and hot reload",
-      category: "Frontend Frameworks"
+      id: "html", 
+      label: "HTML/CSS/JS", 
+      description: "Traditional static website with organized folder structure",
+      category: "Static"
     },
     { 
-      id: "vite-vue", 
-      label: "Vite + Vue", 
-      description: "Vue.js with composition API and TypeScript support",
-      category: "Frontend Frameworks"
+      id: "php", 
+      label: "PHP MVC", 
+      description: "Complete PHP MVC structure with database integration",
+      category: "Backend"
     },
     { 
-      id: "vite-svelte", 
-      label: "Vite + Svelte", 
-      description: "Svelte framework with modern build tooling",
-      category: "Frontend Frameworks"
-    },
-    { 
-      id: "vite-vanilla", 
-      label: "Vite + Vanilla", 
-      description: "Pure JavaScript/TypeScript with Vite bundling",
-      category: "Frontend Frameworks"
-    },
-    { 
-      id: "parcel", 
-      label: "Parcel", 
-      description: "Zero-configuration build tool for web applications",
-      category: "Build Tools"
+      id: "nodejs", 
+      label: "Node.js", 
+      description: "Simple Node.js server with Express.js",
+      category: "Backend"
     },
     { 
       id: "alpine", 
@@ -66,80 +54,51 @@ export function ScaffoldForm() {
       category: "Lightweight"
     },
     { 
-      id: "tailwind-cli", 
-      label: "Tailwind CLI", 
-      description: "Standalone Tailwind CSS with CLI compilation",
-      category: "CSS First"
-    },
-    { 
-      id: "astro", 
-      label: "Astro", 
-      description: "Static site generator with component islands",
-      category: "Static Site"
-    },
-    { 
       id: "eleventy", 
       label: "Eleventy (11ty)", 
       description: "Simple static site generator with flexible templating",
       category: "Static Site"
     },
     { 
-      id: "html", 
-      label: "HTML/CSS/JS", 
-      description: "Traditional static website with organized folder structure",
-      category: "Static"
-    },
-    { 
       id: "cli", 
       label: "Node.js CLI", 
-      description: "Command line interface application with Commander.js",
+      description: "Command line interface application",
       category: "CLI"
     },
     { 
-      id: "php", 
-      label: "PHP MVC", 
-      description: "Complete PHP MVC structure with database integration",
-      category: "Backend"
+      id: "wordpress", 
+      label: "WordPress Theme", 
+      description: "Custom WordPress theme structure",
+      category: "CMS"
     },
   ];
 
   const cssFrameworks = [
-    { id: "tailwind", label: "Tailwind CSS", description: "Utility-first CSS framework" },
     { id: "bootstrap", label: "Bootstrap", description: "Popular CSS framework with components" },
     { id: "bulma", label: "Bulma", description: "Modern CSS framework based on Flexbox" },
-    { id: "unocss", label: "UnoCSS", description: "Instant on-demand atomic CSS engine" },
+    { id: "tailwind", label: "Tailwind CSS", description: "Utility-first CSS framework" },
   ];
 
   const coreFeatures = [
-    { 
-      id: "typescript", 
-      label: "TypeScript", 
-      description: "Static type checking for JavaScript" 
-    },
-    { 
-      id: "eslint", 
-      label: "ESLint", 
-      description: "Code linting and quality checks" 
-    },
     { 
       id: "prettier", 
       label: "Prettier", 
       description: "Code formatting and style consistency" 
     },
     { 
-      id: "tests", 
-      label: "Testing Setup", 
-      description: "Unit and integration testing framework" 
-    },
-    { 
-      id: "pwa", 
-      label: "Progressive Web App", 
-      description: "Service worker and offline capabilities" 
+      id: "eslint", 
+      label: "ESLint", 
+      description: "Code linting for JavaScript" 
     },
     { 
       id: "docker", 
       label: "Docker", 
       description: "Containerization with Dockerfile" 
+    },
+    { 
+      id: "git", 
+      label: "Git Setup", 
+      description: "Initialize Git repository with .gitignore" 
     },
   ];
 
@@ -217,8 +176,8 @@ export function ScaffoldForm() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold">Project Scaffold Generator</h2>
-          <p className="text-muted-foreground">Configure your project and generate the perfect setup command</p>
+          <h2 className="text-3xl font-bold">Simple Project Generator</h2>
+          <p className="text-muted-foreground">Generate clean, simple project structures without the complexity</p>
         </div>
 
         {/* Basic Info */}
@@ -229,7 +188,7 @@ export function ScaffoldForm() {
               id="project-name"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              placeholder="my-awesome-project"
+              placeholder="my-simple-project"
               className="h-11"
             />
           </div>
@@ -267,7 +226,7 @@ export function ScaffoldForm() {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your project and any specific requirements..."
+            placeholder="Describe your project..."
             className="min-h-[120px]"
           />
           <FileUploadSection onFilesUploaded={handleFilesUploaded} />
@@ -325,7 +284,7 @@ export function ScaffoldForm() {
               <SelectValue placeholder="Select a CSS framework" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None</SelectItem>
+              <SelectItem value="none">None (Vanilla CSS)</SelectItem>
               {cssFrameworks.map((framework) => (
                 <SelectItem key={framework.id} value={framework.id}>
                   {framework.label}
@@ -342,7 +301,7 @@ export function ScaffoldForm() {
           )}
         </div>
 
-        {/* Core Features */}
+        {/* Simple Features */}
         <div className="space-y-4">
           <Label className="text-base font-medium">Additional Features</Label>
           <div className="grid sm:grid-cols-2 gap-3">
@@ -369,7 +328,7 @@ export function ScaffoldForm() {
 
         {/* Generate Button */}
         <Button onClick={handleGenerate} className="w-full h-12 text-lg">
-          Generate Scaffold Command
+          Generate Simple Project Command
         </Button>
 
         {/* Generated Command */}
