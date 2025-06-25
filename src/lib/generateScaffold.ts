@@ -138,114 +138,42 @@ export function generateScaffoldCommand(options: ScaffoldOptions): string {
       break;
       
     case "php":
-      command = `mkdir ${projectName} && cd ${projectName} && ` +
-        `mkdir -p app/config app/controllers app/models app/routers app/views/templates/partials core public && ` +
-        `echo "<?php require_once '../core/init.php'; ?>" > public/index.php && ` +
-        `echo "<?php
-session_start();
-require_once 'connexion.php';
-require_once '../app/config/params.php';
-require_once '../app/routers/index.php';
-?>" > core/init.php && ` +
-        `echo "<?php
-class Database {
-    private static \\$instance = null;
-    private \\$pdo;
-    
-    private function __construct() {
-        try {
-            \\$host = 'localhost';
-            \\$dbname = '${projectName}_db';
-            \\$username = 'root';
-            \\$password = '';
-            \\$this->pdo = new PDO(\\\"mysql:host=\\$host;dbname=\\$dbname\\\", \\$username, \\$password);
-            \\$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException \\$e) {
-            die('Database connection failed: ' . \\$e->getMessage());
-        }
-    }
-    
-    public static function getInstance() {
-        if (self::\\$instance === null) {
-            self::\\$instance = new self();
-        }
-        return self::\\$instance;
-    }
-    
-    public function getConnection() {
-        return \\$this->pdo;
-    }
-}
-?>" > core/connexion.php && ` +
-        `echo "<?php
-\\$content = '';
-define('APP_NAME', '${projectName}');
-define('BASE_URL', '/');
-define('ASSETS_URL', BASE_URL . 'public/assets/');
-?>" > app/config/params.php && ` +
-        `echo "<?php
-\\$action = \\$_GET['action'] ?? 'home';
-\\$controller = \\$_GET['controller'] ?? 'pages';
-
-switch (\\$controller) {
-    case 'pages':
-        require_once '../app/controllers/PagesController.php';
-        \\$pagesController = new PagesController();
-        switch (\\$action) {
-            case 'home':
-                \\$pagesController->homeAction();
-                break;
-            default:
-                \\$pagesController->homeAction();
-                break;
-        }
-        break;
-    default:
-        require_once '../app/controllers/PagesController.php';
-        \\$pagesController = new PagesController();
-        \\$pagesController->homeAction();
-        break;
-}
-
-require_once '../app/views/templates/index.php';
-?>" > app/routers/index.php && ` +
-        `echo "<!DOCTYPE html>
-<html lang='${language}'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title><?= APP_NAME ?></title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; line-height: 1.6; }
-        header { background: #333; color: white; padding: 1rem; }
-        nav h1 { margin: 0; }
-        main { padding: 2rem; min-height: 80vh; }
-        footer { background: #333; color: white; text-align: center; padding: 1rem; }
-    </style>
-</head>
-<body>
-    <header>
-        <nav>
-            <h1>${t.welcome} <?= APP_NAME ?></h1>
-        </nav>
-    </header>
-    <main>
-        <?= \\$content ?>
-    </main>
-    <footer>
-        <p>&copy; <?= date('Y') ?> <?= APP_NAME ?></p>
-    </footer>
-</body>
-</html>" > app/views/templates/index.php && ` +
-        `echo "<?php
-class PagesController {
-    public function homeAction() {
-        global \\$content;
-        \\$content = '<h2>${language === 'fr' ? 'Accueil' : 'Home'}</h2><p>${language === 'fr' ? 'Bienvenue dans votre application MVC PHP!' : 'Welcome to your PHP MVC application!'}</p>';
-    }
-}
-?>" > app/controllers/PagesController.php`;
+      command = `mkdir ${projectName} && cd ${projectName}`;
+      
+      // Create directory structure
+      postInstallCommands.push("mkdir app");
+      postInstallCommands.push("mkdir app\\config");
+      postInstallCommands.push("mkdir app\\controllers");
+      postInstallCommands.push("mkdir app\\models");
+      postInstallCommands.push("mkdir app\\routers");
+      postInstallCommands.push("mkdir app\\views");
+      postInstallCommands.push("mkdir app\\views\\templates");
+      postInstallCommands.push("mkdir app\\views\\templates\\partials");
+      postInstallCommands.push("mkdir core");
+      postInstallCommands.push("mkdir public");
+      
+      // Create files with Windows-compatible commands
+      postInstallCommands.push(`echo ^<?php require_once '../core/init.php'; ?^> > public\\index.php`);
+      
+      postInstallCommands.push(`(echo ^<?php & echo session_start(); & echo require_once 'connexion.php'; & echo require_once '../app/config/params.php'; & echo require_once '../app/routers/index.php'; & echo ?^>) > core\\init.php`);
+      
+      postInstallCommands.push(`(echo ^<?php & echo class Database { & echo     private static $instance = null; & echo     private $pdo; & echo. & echo     private function __construct() { & echo         try { & echo             $host = 'localhost'; & echo             $dbname = '${projectName}_db'; & echo             $username = 'root'; & echo             $password = ''; & echo             $this-^>pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password); & echo             $this-^>pdo-^>setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); & echo         } catch(PDOException $e) { & echo             die('Database connection failed: ' . $e-^>getMessage()); & echo         } & echo     } & echo. & echo     public static function getInstance() { & echo         if (self::$instance === null) { & echo             self::$instance = new self(); & echo         } & echo         return self::$instance; & echo     } & echo. & echo     public function getConnection() { & echo         return $this-^>pdo; & echo     } & echo } & echo ?^>) > core\\connexion.php`);
+      
+      postInstallCommands.push(`(echo ^<?php & echo $content = ''; & echo define('APP_NAME', '${projectName}'); & echo define('BASE_URL', '/'); & echo define('ASSETS_URL', BASE_URL . 'public/assets/'); & echo ?^>) > app\\config\\params.php`);
+      
+      postInstallCommands.push(`(echo ^<?php & echo $action = $_GET['action'] ?? 'home'; & echo $controller = $_GET['controller'] ?? 'pages'; & echo. & echo switch ($controller) { & echo     case 'pages': & echo         require_once '../app/controllers/PagesController.php'; & echo         $pagesController = new PagesController(); & echo         switch ($action) { & echo             case 'home': & echo                 $pagesController-^>homeAction(); & echo                 break; & echo             default: & echo                 $pagesController-^>homeAction(); & echo                 break; & echo         } & echo         break; & echo     default: & echo         require_once '../app/controllers/PagesController.php'; & echo         $pagesController = new PagesController(); & echo         $pagesController-^>homeAction(); & echo         break; & echo } & echo. & echo require_once '../app/views/templates/index.php'; & echo ?^>) > app\\routers\\index.php`);
+      
+      postInstallCommands.push(`(echo ^<!DOCTYPE html^> & echo ^<html lang='${language}'^> & echo ^<head^> & echo     ^<meta charset='UTF-8'^> & echo     ^<meta name='viewport' content='width=device-width, initial-scale=1.0'^> & echo     ^<title^>^<?= APP_NAME ?^>^</title^> & echo     ^<style^> & echo         * { margin: 0; padding: 0; box-sizing: border-box; } & echo         body { font-family: Arial, sans-serif; line-height: 1.6; } & echo         header { background: #333; color: white; padding: 1rem; } & echo         nav h1 { margin: 0; } & echo         main { padding: 2rem; min-height: 80vh; } & echo         footer { background: #333; color: white; text-align: center; padding: 1rem; } & echo     ^</style^> & echo ^</head^> & echo ^<body^> & echo     ^<header^> & echo         ^<nav^> & echo             ^<h1^>${t.welcome} ^<?= APP_NAME ?^>^</h1^> & echo         ^</nav^> & echo     ^</header^> & echo     ^<main^> & echo         ^<?= $content ?^> & echo     ^</main^> & echo     ^<footer^> & echo         ^<p^>^&copy; ^<?= date('Y') ?^> ^<?= APP_NAME ?^>^</p^> & echo     ^</footer^> & echo ^</body^> & echo ^</html^>) > app\\views\\templates\\index.php`);
+      
+      postInstallCommands.push(`(echo ^<?php & echo class PagesController { & echo     public function homeAction() { & echo         global $content; & echo         $content = '^<h2^>${language === 'fr' ? 'Accueil' : 'Home'}^</h2^>^<p^>${language === 'fr' ? 'Bienvenue dans votre application MVC PHP!' : 'Welcome to your PHP MVC application!'}^</p^>'; & echo     } & echo } & echo ?^>) > app\\controllers\\PagesController.php`);
+      
+      postInstallCommands.push(`echo # ${projectName} PHP MVC Project > README.md`);
+      postInstallCommands.push(`echo. >> README.md`);
+      postInstallCommands.push(`echo ## Setup Instructions >> README.md`);
+      postInstallCommands.push(`echo 1. Create a database named '${projectName}_db' >> README.md`);
+      postInstallCommands.push(`echo 2. Configure database settings in core/connexion.php >> README.md`);
+      postInstallCommands.push(`echo 3. Start your web server (XAMPP, WAMP, etc.) >> README.md`);
+      postInstallCommands.push(`echo 4. Access your project at http://localhost/yourproject/public >> README.md`);
       break;
       
     default:

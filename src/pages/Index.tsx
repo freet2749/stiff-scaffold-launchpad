@@ -7,6 +7,7 @@ import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Code, Terminal, Zap, Settings, Package, Rocket } from "lucide-react";
@@ -210,6 +211,7 @@ const Index = () => {
         </div>
         
         <Footer />
+        <BackToTop />
       </div>
     </ThemeProvider>
   );
